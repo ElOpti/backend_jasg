@@ -18,24 +18,47 @@ class UsuarioController {
 
   public async add(req: Request, res: Response) {
     try {
-      const usuario = req.body; // Suponiendo que el usuario se envía en el cuerpo de la solicitud
-      const existeUsuario = await usuarioModelo.getByEmail(usuario.email); // Llama al método estático getByEmail
+      const usuario = req.body;
+
+      
+      if (!usuario.email) {
+        return res.status(400).json({ message: "Falta correo electrónico", code: 1 });
+      }
+
+      if (!usuario.password) {
+        return res.status(400).json({ message: "Falta contraseña", code: 1 });
+      }
+      
+      if (!validator.isEmail(usuario.email)) {
+        return res.status(400).json({ message: "El correo electrónico no es válido", code: 1 });
+      }
+
+      if (!usuario.role || !usuario.role) {
+        return res.status(400).json({ message: "Ingresa un rol", code: 1 });
+      }
+
+      
+      if (!validator.isLength(usuario.password, { min: 6 })) {
+        return res.status(400).json({ message: "Contraseña invalida, debe tener al menos 6 caracteres", code: 1 });
+      }
+
+      
+
+      const existeUsuario = await usuarioModelo.getByEmail(usuario.email);
       if (existeUsuario) {
-        return res.status(400).json({ message: "Ya existe un usuario con el mismo correo electrónico", code: 1 });
+        return res.status(400).json({ message: "Usuario exisstente con el mismo correo electrónico", code: 1 });
       } else {
-        // Encriptar la contraseña antes de agregar el usuario
         const encryptedText = await utils.hashPassword(usuario.password);
         usuario.password = encryptedText;
-  
-        // Agregar usuario si no existe
+
         const result = await usuarioModelo.add(usuario);
-        
+
         return res.json({ message: "Usuario agregado correctamente", code: 0 });
       }
     } catch (error: any) {
-      return res.status(500).json({ message: `${error.message}` });
-    }
-  }
+      return res.status(500).json({ message: '${error.message}' });
+    }
+  }
 
   public async update(req: Request, res: Response) {
     try {
