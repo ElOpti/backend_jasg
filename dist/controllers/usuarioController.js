@@ -20,7 +20,9 @@ class UsuarioController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return res.json({ message: "Listado de Usuario", code: 0 });
+                const email = req.query.email; // Suponiendo que el correo electrónico se pasa como parámetro de consulta
+                const usuarios = yield usuarioModelo_1.default.listByEmail(email);
+                return res.json({ message: "Listado de Usuarios por Correo Electrónico", usuarios, code: 0 });
             }
             catch (error) {
                 return res.status(500).json({ message: `${error.message}` });
@@ -69,6 +71,9 @@ class UsuarioController {
                 const existeUsuario = yield usuarioModelo_1.default.getByEmail(usuario.email); // Verifica si el usuario existe
                 if (!existeUsuario) {
                     return res.status(404).json({ message: "Usuario no encontrado", code: 1 });
+                }
+                if (!usuario.password) {
+                    return res.status(400).json({ message: "Falta contraseña", code: 1 });
                 }
                 var encryptedText = yield utils_1.utils.hashPassword(usuario.password);
                 usuario.password = encryptedText;

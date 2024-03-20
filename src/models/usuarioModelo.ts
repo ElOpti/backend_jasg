@@ -1,10 +1,11 @@
 import pool from "../config/connections";
 
 class UsuarioModelo {
-  public async list() {
+  public async listByEmail(email: string) {
     const result = await pool.then(async (connection) => {
       return await connection.query(
-        " SELECT u.email, u.password, u.role " + " FROM tbl_usuario u "
+        " SELECT u.email, u.password, u.role " + " FROM tbl_usuario u ",
+        [email]
       );
     });
     return result;

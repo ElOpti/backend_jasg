@@ -14,10 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const connections_1 = __importDefault(require("../config/connections"));
 class UsuarioModelo {
-    list() {
+    listByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield connections_1.default.then((connection) => __awaiter(this, void 0, void 0, function* () {
-                return yield connection.query(" SELECT u.email, u.password, u.role " + " FROM tbl_usuario u ");
+                return yield connection.query(" SELECT u.email, u.password, u.role " + " FROM tbl_usuario u ", [email]);
             }));
             return result;
         });

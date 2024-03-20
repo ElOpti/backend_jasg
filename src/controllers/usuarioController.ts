@@ -9,7 +9,9 @@ class UsuarioController {
 
   public async list(req: Request, res: Response) {
     try {
-      return res.json({ message: "Listado de Usuario", code: 0 });
+      const email = req.query.email as string; // Suponiendo que el correo electrónico se pasa como parámetro de consulta
+      const usuarios = await usuarioModelo.listByEmail(email);
+      return res.json({ message: "Listado de Usuarios por Correo Electrónico", usuarios, code: 0 });
     } catch (error: any) {
       return res.status(500).json({ message: `${error.message}` });
     }
@@ -66,6 +68,9 @@ class UsuarioController {
       const existeUsuario = await usuarioModelo.getByEmail(usuario.email); // Verifica si el usuario existe
       if (!existeUsuario) {
         return res.status(404).json({ message: "Usuario no encontrado", code: 1 });
+      }
+      if (!usuario.password) {
+        return res.status(400).json({ message: "Falta contraseña", code: 1 });
       }
       var encryptedText = await utils.hashPassword(usuario.password);
       usuario.password = encryptedText;
